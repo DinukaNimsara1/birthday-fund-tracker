@@ -1,20 +1,20 @@
 // Storage utility for handling data persistence via the backend API (MySQL)
-// Supports both build-time (Vite) and runtime (Azure Static Web Apps) configuration
+// Configuration via .env files - VITE_ENV determines dev vs prod mode
 
-// Try build-time env var first (Vite), then runtime config, then fallback to localhost
 const getApiBase = () => {
-  // Build-time variable (set during Azure Static Web Apps build)
-  if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL;
+  // Determine environment from VITE_ENV or Vite's built-in mode detection
+  const isDevelopment = import.meta.env.VITE_ENV === 'development' || 
+                         import.meta.env.VITE_ENV === undefined ||
+                         import.meta.env.DEV || 
+                         import.meta.env.MODE === 'development';
+  
+  if (isDevelopment) {
+    // In development mode, use dev API URL from env or fallback to localhost
+    return import.meta.env.VITE_API_URL_DEV || 'http://localhost:4000';
   }
   
-  // Runtime configuration (for Azure Static Web Apps - can be set via window)
-  if (typeof window !== 'undefined' && window.APP_CONFIG?.API_URL) {
-    return window.APP_CONFIG.API_URL;
-  }
-  
-  // Fallback for local development
-  return 'http://localhost:4000';
+  // In production, use the production API URL from env
+  return import.meta.env.VITE_API_URL || 'http://localhost:4000';
 };
 
 const API_BASE = getApiBase();
