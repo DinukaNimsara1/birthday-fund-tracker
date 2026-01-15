@@ -97,6 +97,10 @@ az webapp up --name birthday-fund-backend --resource-group birthday-fund-rg --ru
 
 ## Step 4: Deploy Frontend (Azure Static Web Apps)
 
+### Prerequisites
+
+The project includes `.nvmrc` and `package.json` engines field to specify Node.js 20.19.0+, which is required for Vite 7. Azure Static Web Apps will automatically use the Node version specified in `.nvmrc`.
+
 ### Option A: Using Azure Portal
 
 1. Go to Azure Portal → Create a resource → Static Web App
@@ -116,6 +120,8 @@ az webapp up --name birthday-fund-backend --resource-group birthday-fund-rg --ru
    ```
    VITE_API_URL=https://birthday-fund-backend.azurewebsites.net
    ```
+
+**Note**: The build will automatically use Node.js 20.19.0+ as specified in `.nvmrc`. If you see Node version errors, ensure `.nvmrc` is committed to your repository.
 
 ### Option B: Using Azure CLI
 

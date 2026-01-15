@@ -6,7 +6,7 @@ import TabNav from './components/TabNav';
 import BirthdayCalendar from './components/BirthdayCalendar';
 import ContributionsTab from './components/ContributionsTab';
 import ExpensesTab from './components/ExpensesTab';
-import SettingsTab from './components/Settingstab';
+import SettingsTab from './components/SettingsTab';
 
 function App() {
   const [members, setMembers] = useState([]);
