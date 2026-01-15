@@ -115,7 +115,7 @@ The project includes `.nvmrc` and `package.json` engines field to specify Node.j
    - **Build presets**: Custom
    - **App location**: `/`
    - **Api location**: Leave empty (backend is separate)
-   - **Output location**: `dist`
+   - **Output location**: `build` (Vite is configured to output to `build` for Azure compatibility)
 5. Add environment variable in **Configuration**:
    ```
    VITE_API_URL=https://birthday-fund-backend.azurewebsites.net
