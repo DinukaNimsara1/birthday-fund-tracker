@@ -7,8 +7,6 @@ export default function SettingsTab({
   onUpdateMonthlyAmount,
   onAddMember,
   onRemoveMember,
-  onAddMember,
-  onRemoveMember,
   onUpdateMemberBirthday,
   managerPassword,
   onUpdateManagerPassword
