@@ -15,6 +15,7 @@ function App() {
   const [monthlyAmount, setMonthlyAmount] = useState(20);
   const [isManager, setIsManager] = useState(false);
   const [currentUser, setCurrentUser] = useState('');
+  const [managerPassword, setManagerPassword] = useState('admin123');
   const [activeTab, setActiveTab] = useState('contributions');
   const [upcomingBirthdays, setUpcomingBirthdays] = useState([]);
 
@@ -43,6 +44,11 @@ function App() {
         setCurrentUser(user.name);
         setIsManager(user.isManager);
       }
+
+      const passwordData = await window.storage.get('birthday-fund-manager-password');
+      if (passwordData) {
+        setManagerPassword(JSON.parse(passwordData.value).value);
+      }
     } catch (error) {
       console.log('No existing data, starting fresh');
     }
@@ -65,19 +71,19 @@ function App() {
   const calculateUpcomingBirthdays = () => {
     const today = new Date();
     const currentYear = today.getFullYear();
-    
+
     const birthdays = members
       .filter(m => m.birthday)
       .map(member => {
         const [month, day] = member.birthday.split('-').map(Number);
         let birthdayThisYear = new Date(currentYear, month - 1, day);
-        
+
         if (birthdayThisYear < today) {
           birthdayThisYear = new Date(currentYear + 1, month - 1, day);
         }
-        
+
         const daysUntil = Math.ceil((birthdayThisYear - today) / (1000 * 60 * 60 * 24));
-        
+
         return {
           ...member,
           nextBirthday: birthdayThisYear,
@@ -88,7 +94,7 @@ function App() {
         };
       })
       .sort((a, b) => a.daysUntil - b.daysUntil);
-    
+
     setUpcomingBirthdays(birthdays);
   };
 
@@ -108,7 +114,7 @@ function App() {
   const markAsPaid = (memberId) => {
     const month = getCurrentMonth();
     const existing = contributions.find(c => c.memberId === memberId && c.month === month);
-    
+
     if (existing) return;
 
     const updated = [...contributions, {
@@ -125,7 +131,7 @@ function App() {
   };
 
   const confirmPayment = (contributionId) => {
-    const updated = contributions.map(c => 
+    const updated = contributions.map(c =>
       c.id === contributionId ? { ...c, confirmed: true } : c
     );
     setContributions(updated);
@@ -133,7 +139,7 @@ function App() {
   };
 
   const unconfirmPayment = (contributionId) => {
-    const updated = contributions.map(c => 
+    const updated = contributions.map(c =>
       c.id === contributionId ? { ...c, confirmed: false } : c
     );
     setContributions(updated);
@@ -156,8 +162,8 @@ function App() {
   };
 
   const addMember = (memberData) => {
-    const updated = [...members, { 
-      id: Date.now(), 
+    const updated = [...members, {
+      id: Date.now(),
       ...memberData
     }];
     setMembers(updated);
@@ -171,7 +177,7 @@ function App() {
   };
 
   const updateMemberBirthday = (memberId, birthday) => {
-    const updated = members.map(m => 
+    const updated = members.map(m =>
       m.id === memberId ? { ...m, birthday } : m
     );
     setMembers(updated);
@@ -183,8 +189,19 @@ function App() {
     saveData('birthday-fund-monthly-amount', amount);
   };
 
+  const updateManagerPassword = (newPassword) => {
+    setManagerPassword(newPassword);
+    saveData('birthday-fund-manager-password', { value: newPassword });
+  };
+
   if (!currentUser) {
-    return <LoginScreen members={members} onSelectUser={selectUser} />;
+    return (
+      <LoginScreen
+        members={members}
+        onSelectUser={selectUser}
+        managerPassword={managerPassword}
+      />
+    );
   }
 
   const todaysBirthdays = upcomingBirthdays.filter(b => b.isToday);
@@ -193,26 +210,26 @@ function App() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-4">
       <div className="max-w-6xl mx-auto">
-        <Header 
-          currentUser={currentUser} 
+        <Header
+          currentUser={currentUser}
           balance={calculateBalance()}
           onSwitchUser={() => {
             setCurrentUser('');
             setIsManager(false);
           }}
         />
-        
-        <BirthdayReminders 
+
+        <BirthdayReminders
           todaysBirthdays={todaysBirthdays}
           thisWeekBirthdays={thisWeekBirthdays}
         />
-        
-        <TabNav 
+
+        <TabNav
           activeTab={activeTab}
           onTabChange={setActiveTab}
           isManager={isManager}
         />
-        
+
         {activeTab === 'contributions' && (
           <ContributionsTab
             members={members}
@@ -247,6 +264,8 @@ function App() {
             onAddMember={addMember}
             onRemoveMember={removeMember}
             onUpdateMemberBirthday={updateMemberBirthday}
+            managerPassword={managerPassword}
+            onUpdateManagerPassword={updateManagerPassword}
           />
         )}
       </div>

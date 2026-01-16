@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Trash2, Cake } from 'lucide-react';
+import { Plus, Trash2, Cake, Lock } from 'lucide-react';
 
 export default function SettingsTab({
   members,
@@ -7,21 +7,34 @@ export default function SettingsTab({
   onUpdateMonthlyAmount,
   onAddMember,
   onRemoveMember,
-  onUpdateMemberBirthday
+  onAddMember,
+  onRemoveMember,
+  onUpdateMemberBirthday,
+  managerPassword,
+  onUpdateManagerPassword
 }) {
   const [showAddMember, setShowAddMember] = useState(false);
   const [newMemberName, setNewMemberName] = useState('');
   const [newMemberBirthday, setNewMemberBirthday] = useState('');
   const [tempMonthlyAmount, setTempMonthlyAmount] = useState(monthlyAmount);
+  const [newPassword, setNewPassword] = useState('');
+
+  const handleChangePassword = () => {
+    if (newPassword.trim()) {
+      onUpdateManagerPassword(newPassword.trim());
+      setNewPassword('');
+      alert('Password updated successfully');
+    }
+  };
 
   const handleAddMember = () => {
     if (!newMemberName.trim()) return;
-    
+
     onAddMember({
       name: newMemberName.trim(),
       birthday: newMemberBirthday || null
     });
-    
+
     setNewMemberName('');
     setNewMemberBirthday('');
     setShowAddMember(false);
@@ -30,7 +43,7 @@ export default function SettingsTab({
   return (
     <div className="bg-white rounded-2xl shadow-xl p-6">
       <h2 className="text-xl font-bold text-gray-800 mb-6">Settings</h2>
-      
+
       <div className="mb-8 p-4 bg-gray-50 rounded-xl">
         <h3 className="font-semibold mb-3">Monthly Contribution Amount</h3>
         <div className="flex gap-2">
@@ -45,6 +58,27 @@ export default function SettingsTab({
             className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
           >
             Save
+          </button>
+        </div>
+      </div>
+
+      <div className="mb-8 p-4 bg-gray-50 rounded-xl">
+        <h3 className="font-semibold mb-3 flex items-center gap-2">
+          <Lock className="w-4 h-4" /> Manager Password
+        </h3>
+        <div className="flex gap-2">
+          <input
+            type="password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            placeholder="New Password"
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+          />
+          <button
+            onClick={handleChangePassword}
+            className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+          >
+            Update
           </button>
         </div>
       </div>
