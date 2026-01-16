@@ -41,10 +41,22 @@ function App() {
       if (amountData) setMonthlyAmount(parseFloat(amountData.value));
       if (userData) {
         const user = JSON.parse(userData.value);
-        setCurrentUser(user.name);
-        setIsManager(user.isManager);
+        
+        if (!user.isManager) {
+          // Regular users always stay logged in
+          setCurrentUser(user.name);
+          setIsManager(user.isManager);
+        } else {
+          // Managers stay logged in for 24 hours
+          const LOGIN_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+          const now = Date.now();
+          if (user.loginTimestamp && (now - user.loginTimestamp < LOGIN_DURATION)) {
+            setCurrentUser(user.name);
+            setIsManager(user.isManager);
+          }
+        }
       }
-
+      
       const passwordData = await window.storage.get('birthday-fund-manager-password');
       if (passwordData) {
         setManagerPassword(JSON.parse(passwordData.value).value);
@@ -65,7 +77,11 @@ function App() {
   const selectUser = (name, manager = false) => {
     setCurrentUser(name);
     setIsManager(manager);
-    saveData('birthday-fund-current-user', { name, isManager: manager });
+    saveData('birthday-fund-current-user', { 
+      name, 
+      isManager: manager,
+      loginTimestamp: Date.now() 
+    });
   };
 
   const calculateUpcomingBirthdays = () => {

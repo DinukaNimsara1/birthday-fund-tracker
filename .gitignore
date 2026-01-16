@@ -12,6 +12,7 @@ dist
 dist-ssr
 build
 *.local
+package-lock.json
 
 # Environment variables
 .env.local
